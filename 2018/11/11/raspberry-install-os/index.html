@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.5.0" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.5.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.5.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.5.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.5.0" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '6.5.0',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="最近入手一块树莓派3B+, 记录一下拿到开发板之后的一系列配置流程. 一. 安装操作系统拿到开发板第一步是安装操作系统, 我们选择树莓派基金会官方的Raspbian系统. 下载树莓派系统镜像首先到树莓派官方网站下载系统镜像, 镜像分 Raspbian Stretch with desktop 和 Raspbian Stretch Lite 两种, Stretch 是 Debian 版本代号, 代表">
+<meta property="og:type" content="article">
+<meta property="og:title" content="树莓派3B+开发环境配置">
+<meta property="og:url" content="http://yoursite.com/2018/11/11/raspberry-install-os/index.html">
+<meta property="og:site_name" content="Mark">
+<meta property="og:description" content="最近入手一块树莓派3B+, 记录一下拿到开发板之后的一系列配置流程. 一. 安装操作系统拿到开发板第一步是安装操作系统, 我们选择树莓派基金会官方的Raspbian系统. 下载树莓派系统镜像首先到树莓派官方网站下载系统镜像, 镜像分 Raspbian Stretch with desktop 和 Raspbian Stretch Lite 两种, Stretch 是 Debian 版本代号, 代表">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="http://yoursite.com/images/raspberry_install_os/downloadOS.png">
+<meta property="og:image" content="http://yoursite.com/images/raspberry_install_os/win32Disk.png">
+<meta property="og:image" content="http://yoursite.com/images/raspberry_install_os/login.png">
+<meta property="og:image" content="http://yoursite.com/images/raspberry_install_os/ethernet.png">
+<meta property="og:image" content="http://yoursite.com/images/raspberry_install_os/ethernet_ip.png">
+<meta property="og:updated_time" content="2019-03-18T13:27:39.880Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="树莓派3B+开发环境配置">
+<meta name="twitter:description" content="最近入手一块树莓派3B+, 记录一下拿到开发板之后的一系列配置流程. 一. 安装操作系统拿到开发板第一步是安装操作系统, 我们选择树莓派基金会官方的Raspbian系统. 下载树莓派系统镜像首先到树莓派官方网站下载系统镜像, 镜像分 Raspbian Stretch with desktop 和 Raspbian Stretch Lite 两种, Stretch 是 Debian 版本代号, 代表">
+<meta name="twitter:image" content="http://yoursite.com/images/raspberry_install_os/downloadOS.png">
+
+
+
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/11/11/raspberry-install-os/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>树莓派3B+开发环境配置 | Mark</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Mark</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />Home</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />Archives</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/11/11/raspberry-install-os/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Mark Smith">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Mark">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">树莓派3B+开发环境配置
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2018-11-11 21:07:53" itemprop="dateCreated datePublished" datetime="2018-11-11T21:07:53+08:00">2018-11-11</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2019-03-18 21:27:39" itemprop="dateModified" datetime="2019-03-18T21:27:39+08:00">2019-03-18</time>
+              
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>最近入手一块<a href="https://www.raspberrypi.org/products/raspberry-pi-3-model-b-plus/" target="_blank" rel="noopener">树莓派3B+</a>, 记录一下拿到开发板之后的一系列配置流程.</p>
+<h2 id="一-安装操作系统"><a href="#一-安装操作系统" class="headerlink" title="一. 安装操作系统"></a>一. 安装操作系统</h2><p>拿到开发板第一步是安装操作系统, 我们选择树莓派基金会官方的Raspbian系统.</p>
+<h3 id="下载树莓派系统镜像"><a href="#下载树莓派系统镜像" class="headerlink" title="下载树莓派系统镜像"></a>下载树莓派系统镜像</h3><p>首先到树莓派<a href="https://www.raspberrypi.org/downloads/" target="_blank" rel="noopener">官方网站</a>下载系统镜像, 镜像分 Raspbian Stretch with desktop 和 Raspbian Stretch Lite 两种, Stretch 是 Debian 版本代号, 代表 Debian 9. “with desktop” 系统主要比后者多了 X-Server 相关的套件, 提供桌面环境. 由于我不需要界面应用程序, 因此, 选择安装Raspbian Stretch Lite 系统.<br><img src="/images/raspberry_install_os/downloadOS.png" height="330" width="495"></p>
+<h3 id="烧写系统镜像到SD卡"><a href="#烧写系统镜像到SD卡" class="headerlink" title="烧写系统镜像到SD卡"></a>烧写系统镜像到SD卡</h3><p>在 Windows 下, 使用 Win32 Disk Imager 工具, 将系统镜像烧录到 SD 卡中. 镜像文件选择 Raspbian Stretch Lite 镜像, 设备选择我们的SD卡对应的盘符. 点击”开始”即可开始烧写过程, 大约2分钟烧写即可完成. (SD 卡有速度等级之分, 运行树莓派系统建议选择级别在 Class 10 及以上的 SD 卡)<br><img src="/images/raspberry_install_os/win32Disk.png" height="330" width="495"></p>
+<h3 id="启用-ssh-远程登录"><a href="#启用-ssh-远程登录" class="headerlink" title="启用 ssh 远程登录"></a>启用 ssh 远程登录</h3><p>树莓派默认未开启 ssh 服务, 后面我们需要通过 ssh 远程操作树莓派, 在 SD 卡 boot 分区下面新建名为 ssh 的空文件即可开启树莓派的 ssh 服务.</p>
+<h2 id="二-系统连接"><a href="#二-系统连接" class="headerlink" title="二. 系统连接"></a>二. 系统连接</h2><p>系统装好后, 下一步登录树莓派进行操作. 这里介绍登录树莓派的两种方法.</p>
+<h3 id="串口登录"><a href="#串口登录" class="headerlink" title="串口登录"></a>串口登录</h3><ol>
+<li>硬件连接<br> 通过串口登录首先需要一个 USB 转 TTL 模块以及三根杜邦线, 通过杜邦线将 USB 转 TTL 模块与树莓派对应引脚进行连接, 对应关系如下表.</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">Raspberry Pi GPIO pin</th>
+<th style="text-align:center">USB2TTL pin</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">6</td>
+<td style="text-align:center">GND</td>
+</tr>
+<tr>
+<td style="text-align:center">8</td>
+<td style="text-align:center">RX</td>
+</tr>
+<tr>
+<td style="text-align:center">10</td>
+<td style="text-align:center">TX</td>
+</tr>
+</tbody>
+</table>
+<ol start="2">
+<li><p>开启串口调试功能<br> 树莓派串口默认是关闭的, 在通过串口登录树莓派前, 我们需要打开串口功能. 修改 SD 卡 boot 分区下的 config.txt 文件, 在文件最后添加</p>
+ <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">enable_uart=1</span><br></pre></td></tr></table></figure>
+<p> 即可打开树莓派的串口调试功能.  </p>
+</li>
+<li><p>安装串口软件<br> 在 Ubuntu 下, 安装 minicom 串口调试软件.</p>
+ <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo apt-get install minicom</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>串口登录<br> 将 USB 转 TTL 模块插入电脑, 打开 minicom 软件.</p>
+ <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo minicom -b 115200 -D /dev/ttyUSB0</span><br></pre></td></tr></table></figure>
+<p> 115200 是树莓派串口的默认波特率, /dev/ttyUSB0 对应 USB 转 TTL 模块. 树莓派上电即可自动运行, 此时,会在 minicom 页面看到如下输出. 根据提示, 输入用户名和密码即可登录树莓派. 默认用户名是 pi, 密码是 raspberry.<br> <img src="/images/raspberry_install_os/login.png" height="330" width="495"></p>
+</li>
+</ol>
+<h3 id="网线直连"><a href="#网线直连" class="headerlink" title="网线直连"></a>网线直连</h3><p>如果身边没有 USB 转 TTL 模块, 可以采用网线直连方式操作树莓派. </p>
+<ol>
+<li><p>配置计算机网络连接方式<br> 用一根网线将电脑与树莓派直接连接, 在电脑端输入</p>
+ <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">nm-connection-editor</span><br></pre></td></tr></table></figure>
+<p> 配置有线网络连接方式为 Shared to other computers.<br> <img src="/images/raspberry_install_os/ethernet.png" height="330" width="495"></p>
+</li>
+<li><p>查看树莓派 IP<br> Terminal 下运行</p>
+ <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ifconfig</span><br></pre></td></tr></table></figure>
+<p> 可知当前计算机 IP 为 10.42.0.1. 安装 nmap 软件查找树莓派 IP 地址.</p>
+ <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sudo apt-get install nmap</span><br><span class="line">nmap 10.42.0/24</span><br></pre></td></tr></table></figure>
+<p> 可以看到, 当前局域网下共两台设备, 一台是我们的电脑, 一台是树莓派, 树莓派的 IP 地址为 10.42.0.159.<br> <img src="/images/raspberry_install_os/ethernet_ip.png" height="330" width="495"></p>
+</li>
+<li><p>ssh 登录<br> 通过 ssh, 即可远程登录树莓派. </p>
+ <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ssh pi@10.42.0.159</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<h2 id="三-网络配置"><a href="#三-网络配置" class="headerlink" title="三. 网络配置"></a>三. 网络配置</h2><p>登录到树莓派后, 第一件事就是配置网络, 树莓派3B+ 提供了有线网络和 wifi 网络, 下面分别对两种网络进行配置. </p>
+<h3 id="有线网络配置"><a href="#有线网络配置" class="headerlink" title="有线网络配置"></a>有线网络配置</h3><p>树莓派默认配置使用 DHCP 自动获取IP地址, 下面我们为树莓派配置静态 IP 地址.<br>使用 nano 编辑器打开 /etc/dhcpcd.conf 文件.<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo nano /etc/dhcpcd.conf</span><br></pre></td></tr></table></figure></p>
+<p>在文件最后添加<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">interface eth0</span><br><span class="line">static ip_address=192.168.21.103/24</span><br><span class="line">static routers=192.168.21.1</span><br><span class="line">static domain_name_servers=10.10.0.21 8.8.8.8</span><br></pre></td></tr></table></figure></p>
+<p>上述参数可自己根据情况修改. 将文件保存, 重启网络即可.<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo /etc/init.d/networking restart</span><br></pre></td></tr></table></figure></p>
+<h3 id="无线网络配置"><a href="#无线网络配置" class="headerlink" title="无线网络配置"></a>无线网络配置</h3><p>由于树莓派3B+ 支持运行在 5G Hz 频段的 wifi, 不同国家和地区在 5G 的频段有所差异, 因此, 我们要首先设置所在国家/地区.<br>编辑文件 wpa_supplicant.conf<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo nano /etc/wpa_supplicant/wpa_supplicant.conf</span><br></pre></td></tr></table></figure></p>
+<p>设置所在国家, 并添加无线 SSID 和 password 信息.<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">country=CN</span><br><span class="line">ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev</span><br><span class="line">update_config=1</span><br><span class="line"></span><br><span class="line">network=&#123;</span><br><span class="line">    ssid=<span class="string">"SSID"</span></span><br><span class="line">    psk=<span class="string">"XXXXX"</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>编辑文件 dhcpcd.conf<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo nano /etc/dhcpcd.conf</span><br></pre></td></tr></table></figure></p>
+<p>设置静态/动态IP地址.<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">interface wlan0</span><br><span class="line">static ip_address=192.168.199.12/24</span><br><span class="line">static routers=192.168.199.1</span><br><span class="line">static domain_name_servers=192.168.199.1</span><br></pre></td></tr></table></figure></p>
+<p>至此, 树莓派3B+ 网络配置完成, 用户可以通过 ssh 等协议远程操作树莓派.</p>
+<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p>[1] <a href="https://www.raspberrypi.org/" target="_blank" rel="noopener">https://www.raspberrypi.org/</a><br>[2]  <a href="https://blog.csdn.net/w_z_z_1991/article/details/52670047" target="_blank" rel="noopener">https://blog.csdn.net/w_z_z_1991/article/details/52670047</a><br>[3] <a href="https://www.jianshu.com/p/b437558dd028" target="_blank" rel="noopener">https://www.jianshu.com/p/b437558dd028</a><br>[4] <a href="https://www.jianshu.com/p/b0e6d066d6b6" target="_blank" rel="noopener">https://www.jianshu.com/p/b0e6d066d6b6</a></p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/02/20/browse-video-automatically/" rel="prev" title="自动刷课脚本">
+                自动刷课脚本 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+    <div id="gitalk-container">
+    </div>
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Mark Smith</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">5</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#一-安装操作系统"><span class="nav-number">1.</span> <span class="nav-text">一. 安装操作系统</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#下载树莓派系统镜像"><span class="nav-number">1.1.</span> <span class="nav-text">下载树莓派系统镜像</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#烧写系统镜像到SD卡"><span class="nav-number">1.2.</span> <span class="nav-text">烧写系统镜像到SD卡</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#启用-ssh-远程登录"><span class="nav-number">1.3.</span> <span class="nav-text">启用 ssh 远程登录</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#二-系统连接"><span class="nav-number">2.</span> <span class="nav-text">二. 系统连接</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#串口登录"><span class="nav-number">2.1.</span> <span class="nav-text">串口登录</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#网线直连"><span class="nav-number">2.2.</span> <span class="nav-text">网线直连</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#三-网络配置"><span class="nav-number">3.</span> <span class="nav-text">三. 网络配置</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#有线网络配置"><span class="nav-number">3.1.</span> <span class="nav-text">有线网络配置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#无线网络配置"><span class="nav-number">3.2.</span> <span class="nav-text">无线网络配置</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考资料"><span class="nav-number">4.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright"> &copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Mark Smith</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> v3.7.1</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme – <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Pisces</a> v6.5.0</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.5.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.5.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.5.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.5.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.5.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.5.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.5.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+  <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+   <script type="text/javascript">
+        var gitalk = new Gitalk({
+          clientID: 'e06a8131ccdebf83b30b',
+          clientSecret: '992ea430c804ee621491b26f6510fb6ffeaa2754',
+          repo: 'zjd0112.github.io',
+          owner: 'zjd0112',
+          admin: ['zjd0112'],
+          id: location.pathname,
+          distractionFreeMode: 'true'
+        })
+        gitalk.render('gitalk-container')           
+       </script>
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

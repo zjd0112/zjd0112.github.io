@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.5.0" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.5.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.5.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.5.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.5.0" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '6.5.0',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="最近学驾照, 理论部分需要刷满14个小时的视频才能预约考试(http://hz.5u5u5u5u.com), 于是做了一个自动刷课的脚本. 问题网站通过以下两种方式验证学习者是否在观看视频:  在视频播放过程中, 网站会随机弹出验证码, 以验证观看者是否观看. 视频网站会检测用户鼠标, 键盘的操作, 如果长时间未操作, 视频播放会自动停止.为了实现视频播放的自动化, 脚本主要实现了两个功能, 一是">
+<meta property="og:type" content="article">
+<meta property="og:title" content="自动刷课脚本">
+<meta property="og:url" content="http://yoursite.com/2019/02/20/browse-video-automatically/index.html">
+<meta property="og:site_name" content="Mark">
+<meta property="og:description" content="最近学驾照, 理论部分需要刷满14个小时的视频才能预约考试(http://hz.5u5u5u5u.com), 于是做了一个自动刷课的脚本. 问题网站通过以下两种方式验证学习者是否在观看视频:  在视频播放过程中, 网站会随机弹出验证码, 以验证观看者是否观看. 视频网站会检测用户鼠标, 键盘的操作, 如果长时间未操作, 视频播放会自动停止.为了实现视频播放的自动化, 脚本主要实现了两个功能, 一是">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="https://raw.githubusercontent.com/zjd0112/BrowseVideo/master/images/IdentifyCode.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/zjd0112/BrowseVideo/master/images/responseData.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/zjd0112/BrowseVideo/master/images/flow_chart.png">
+<meta property="og:updated_time" content="2019-03-18T13:27:39.896Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="自动刷课脚本">
+<meta name="twitter:description" content="最近学驾照, 理论部分需要刷满14个小时的视频才能预约考试(http://hz.5u5u5u5u.com), 于是做了一个自动刷课的脚本. 问题网站通过以下两种方式验证学习者是否在观看视频:  在视频播放过程中, 网站会随机弹出验证码, 以验证观看者是否观看. 视频网站会检测用户鼠标, 键盘的操作, 如果长时间未操作, 视频播放会自动停止.为了实现视频播放的自动化, 脚本主要实现了两个功能, 一是">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/zjd0112/BrowseVideo/master/images/IdentifyCode.png">
+
+
+
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2019/02/20/browse-video-automatically/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>自动刷课脚本 | Mark</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Mark</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />Home</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />Archives</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/02/20/browse-video-automatically/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Mark Smith">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Mark">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">自动刷课脚本
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2019-02-20 10:30:54" itemprop="dateCreated datePublished" datetime="2019-02-20T10:30:54+08:00">2019-02-20</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2019-03-18 21:27:39" itemprop="dateModified" datetime="2019-03-18T21:27:39+08:00">2019-03-18</time>
+              
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>最近学驾照, 理论部分需要刷满14个小时的视频才能预约考试(<a href="http://hz.5u5u5u5u.com" target="_blank" rel="noopener">http://hz.5u5u5u5u.com</a>), 于是做了一个自动刷课的脚本.</p>
+<h2 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h2><p>网站通过以下两种方式验证学习者是否在观看视频:</p>
+<ul>
+<li>在视频播放过程中, 网站会随机弹出验证码, 以验证观看者是否观看.</li>
+<li>视频网站会检测用户鼠标, 键盘的操作, 如果长时间未操作, 视频播放会自动停止.<br>为了实现视频播放的自动化, 脚本主要实现了两个功能, 一是验证码识别, 二是鼠标, 键盘操作模拟.</li>
+</ul>
+<h2 id="功能"><a href="#功能" class="headerlink" title="功能"></a>功能</h2><h3 id="验证码识别"><a href="#验证码识别" class="headerlink" title="验证码识别"></a>验证码识别</h3><p>视频网站用的验证码如下, 需要在图片上顺序点击文字才能通过验证.<br><img src="https://raw.githubusercontent.com/zjd0112/BrowseVideo/master/images/IdentifyCode.png" alt="验证码图片示例"></p>
+<p>验证码识别有两种方法, 一是自己使用图像识别相关技术自己训练模型识别; 二是利用现成的打码平台识别. 由于本人比较懒, 自然选择了第二种方式. 如果读者想要自己训练模型识别此类验证码, 可参考文章<a href="https://zhuanlan.zhihu.com/p/34186397" target="_blank" rel="noopener">使用深度学习破解点击验证码</a>.</p>
+<p>我用的打码平台是<a href="http://www.chaojiying.com/" target="_blank" rel="noopener">超级鹰</a>, 类似的还有<a href="http://www.damatu1.com/" target="_blank" rel="noopener">打码兔</a>, <a href="http://www.datibar.com/index_login.do" target="_blank" rel="noopener">答题吧</a>等应该都可以实现我们需要的功能. 平台使用较为简单, 只需要将图片按照固定格式上传, 平台即可返回识别结果. 具体流程参见平台的相关介绍. 对于上述验证码, 平台返回的结果为需要点击的四个点的坐标, 格式如下图所示.<br><img src="https://raw.githubusercontent.com/zjd0112/BrowseVideo/master/images/responseData.png" alt="平台返回数据示例"></p>
+<p>得到验证码识别结果后, 我们需要模拟鼠标点击操作, 创建Event, 将点击的坐标作为Event的参数传入. 另外, 得到的验证码点击坐标仅仅是针对验证码图片的, 我们需要对打码平台返回的坐标进行处理, 得到真实应该点击的坐标. 创建Event的代码如下.<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">for (var count = 0; count &lt; pic_array.length; count++)</span><br><span class="line">&#123;</span><br><span class="line">    var position_array = pic_array[count].split(&quot;,&quot;);</span><br><span class="line">    var clientX = parseInt(position_array[0]);</span><br><span class="line">    var clientY = parseInt(position_array[1]);</span><br><span class="line">    var clickPos = CPos.$getMousePos(clientX, clientY);</span><br><span class="line">    var absPos = CPos.$getAbsPos(document.getElementById(&apos;validateImg&apos;));</span><br><span class="line"></span><br><span class="line">    ev.clientX = clickPos.x + absPos.x;</span><br><span class="line">    ev.clientY = clickPos.y + absPos.y;</span><br><span class="line"></span><br><span class="line">    ev.initEvent(&apos;click&apos;, false, true); </span><br><span class="line">    document.getElementById(&apos;validateImg&apos;).dispatchEvent(ev);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h3 id="鼠标-键盘操作模拟"><a href="#鼠标-键盘操作模拟" class="headerlink" title="鼠标+键盘操作模拟"></a>鼠标+键盘操作模拟</h3><p>验证码识别搞定后, 发现平台还会检测用户的鼠标键盘操作. 如果用户长时间未操作鼠标键盘, 平台会自动停止视频播放. 网上找了一下, 发现jQuery提供了鼠标点击, 键盘按键的触发函数, 使用示例如下代码所示, 具体信息可参考 <a href="https://www.jquery123.com/mouseup/" target="_blank" rel="noopener">https://www.jquery123.com/mouseup/</a>.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html lang=&quot;en&quot;&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">    &lt;meta charset=&quot;UTF-8&quot;&gt;</span><br><span class="line">    &lt;title&gt;Document&lt;/title&gt;</span><br><span class="line">&lt;/head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">    &lt;button id=&quot;fuck&quot;&gt;fuck&lt;/button&gt;</span><br><span class="line">    &lt;img id=&quot;id_img&quot;&gt;&lt;/img&gt;</span><br><span class="line">    &lt;p&gt;Press mouse and release here.&lt;/p&gt;</span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;script src=&quot;https://cdn.bootcss.com/jquery/1.9.1/jquery.min.js&quot;&gt;&lt;/script&gt;</span><br><span class="line">&lt;script&gt;</span><br><span class="line">    // jQuery插件。一个jQuery对象，而不是直接调用。</span><br><span class="line">    jQuery.fn.simulateKeyPress = function(character) &#123;</span><br><span class="line">        // 内部调用jQuery.event.trigger</span><br><span class="line">        // 参数有 (Event, data, elem). 最后一个参数是非常重要的的！</span><br><span class="line">        jQuery(this).trigger(&#123; type: &apos;keypress&apos;, which: character.charCodeAt(0) &#125;);</span><br><span class="line">    &#125;;</span><br><span class="line">    </span><br><span class="line">    //页面调用</span><br><span class="line">    jQuery(document).ready( function($) &#123;</span><br><span class="line">        // 绑定事件处理程序</span><br><span class="line">        $( &apos;body&apos; ).keypress( function(e) &#123;</span><br><span class="line">            alert( String.fromCharCode( e.which ) );</span><br><span class="line">            console.log(e);</span><br><span class="line">        &#125;);</span><br><span class="line">        // 模拟按键了 x</span><br><span class="line">        $( &apos;body&apos; ).simulateKeyPress(&apos;x&apos;);</span><br><span class="line">    &#125;);</span><br><span class="line"></span><br><span class="line">    $(&quot;p&quot;).mouseup(function() &#123;</span><br><span class="line">        $( this ).append( &quot;&lt;span style=&apos;color:#f00;&apos;&gt;Mouse up.&lt;/span&gt;&quot; );</span><br><span class="line">    &#125;)</span><br><span class="line">    $(&quot;p&quot;).mousedown(function() &#123;</span><br><span class="line">        $( this ).append( &quot;&lt;span style=&apos;color:#00f;&apos;&gt;Mouse down.&lt;/span&gt;&quot; );</span><br><span class="line">    &#125;);</span><br><span class="line">    $(&quot;body&quot;).mousemove(function() &#123;</span><br><span class="line">        $(&quot;p&quot;).append( &quot;&lt;span style=&apos;color:#00f;&apos;&gt;Mouse move.&lt;/span&gt;&quot; )</span><br><span class="line">    &#125;);</span><br><span class="line">    document.body.onmousedown = function()&#123;alert(&quot;test&quot;);&#125;;</span><br><span class="line"></span><br><span class="line">&lt;/script&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure>
+<p>基于上述两个功能的实现, 可以完成一个简单的自动刷课脚本. 代码运行的流程图如下所示. 完整的代码请见github: <a href="https://github.com/zjd0112/BrowseVideo" target="_blank" rel="noopener">https://github.com/zjd0112/BrowseVideo</a>.<br><img src="https://raw.githubusercontent.com/zjd0112/BrowseVideo/master/images/flow_chart.png" alt="脚本运行流程">.</p>
+<p>参考文章:<br><a href="https://www.cnblogs.com/CyLee/p/7513342.html" target="_blank" rel="noopener">https://www.cnblogs.com/CyLee/p/7513342.html</a><br><a href="https://www.jquery123.com/mouseup/" target="_blank" rel="noopener">https://www.jquery123.com/mouseup/</a><br><a href="https://zhuanlan.zhihu.com/p/34186397" target="_blank" rel="noopener">https://zhuanlan.zhihu.com/p/34186397</a></p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/11/11/raspberry-install-os/" rel="next" title="树莓派3B+开发环境配置">
+                <i class="fa fa-chevron-left"></i> 树莓派3B+开发环境配置
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/03/18/hello-world/" rel="prev" title="Hello World">
+                Hello World <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+    <div id="gitalk-container">
+    </div>
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Mark Smith</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">5</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#问题"><span class="nav-number">1.</span> <span class="nav-text">问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#功能"><span class="nav-number">2.</span> <span class="nav-text">功能</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#验证码识别"><span class="nav-number">2.1.</span> <span class="nav-text">验证码识别</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#鼠标-键盘操作模拟"><span class="nav-number">2.2.</span> <span class="nav-text">鼠标+键盘操作模拟</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright"> &copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Mark Smith</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> v3.7.1</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme – <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Pisces</a> v6.5.0</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.5.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.5.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.5.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.5.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.5.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.5.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.5.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+  <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+   <script type="text/javascript">
+        var gitalk = new Gitalk({
+          clientID: 'e06a8131ccdebf83b30b',
+          clientSecret: '992ea430c804ee621491b26f6510fb6ffeaa2754',
+          repo: 'zjd0112.github.io',
+          owner: 'zjd0112',
+          admin: ['zjd0112'],
+          id: location.pathname,
+          distractionFreeMode: 'true'
+        })
+        gitalk.render('gitalk-container')           
+       </script>
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
