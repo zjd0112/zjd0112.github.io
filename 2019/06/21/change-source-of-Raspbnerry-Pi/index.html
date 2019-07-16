@@ -115,7 +115,7 @@
 <meta property="og:site_name" content="Mark">
 <meta property="og:description" content="树莓派默认的更新源访问速度较慢，这里，我们将树莓派的源改为中科大站点。主要修改两个文件: 软件更新源和系统更新源。 替换软件更新源 编辑 /etc/apt/sources.list 文件   1sudo nano /etc/apt/sources.list  删除原文件所有内容，用以下内容取代：   1deb http://mirrors.ustc.edu.cn/raspbian/raspbian">
 <meta property="og:locale" content="default">
-<meta property="og:updated_time" content="2019-06-21T05:06:50.363Z">
+<meta property="og:updated_time" content="2019-07-16T02:19:37.112Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="树莓派更换国内镜像源">
 <meta name="twitter:description" content="树莓派默认的更新源访问速度较慢，这里，我们将树莓派的源改为中科大站点。主要修改两个文件: 软件更新源和系统更新源。 替换软件更新源 编辑 /etc/apt/sources.list 文件   1sudo nano /etc/apt/sources.list  删除原文件所有内容，用以下内容取代：   1deb http://mirrors.ustc.edu.cn/raspbian/raspbian">
@@ -229,9 +229,33 @@
         
         
           
+          <li class="menu-item menu-item-categories">
+    <a href="/categories/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-th"></i> <br />Categories</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+    <a href="/tags/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />Tags</a>
+  </li>
+        
+        
+        
+          
           <li class="menu-item menu-item-archives">
     <a href="/archives/" rel="section">
       <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />Archives</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+    <a href="/about/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-user"></i> <br />About</a>
   </li>
 
       
@@ -287,7 +311,7 @@
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Mark Smith">
       <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="image" content="/images/avatar.jpeg">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
@@ -324,16 +348,46 @@
                 
               
 
-              <time title="Created: 2019-06-21 11:59:48 / Modified: 13:06:50" itemprop="dateCreated datePublished" datetime="2019-06-21T11:59:48+08:00">2019-06-21</time>
+              <time title="Created: 2019-06-21 11:59:48" itemprop="dateCreated datePublished" datetime="2019-06-21T11:59:48+08:00">2019-06-21</time>
             
 
             
               
 
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2019-07-16 10:19:37" itemprop="dateModified" datetime="2019-07-16T10:19:37+08:00">2019-07-16</time>
               
             
           </span>
 
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Raspberry-Pi/" itemprop="url" rel="index"><span itemprop="name">Raspberry Pi</span></a></span>
+
+                
+                
+              
+            </span>
           
 
           
@@ -376,7 +430,8 @@
   <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo nano /etc/apt/sources.list.d/raspi.list</span><br></pre></td></tr></table></figure>
 </li>
 <li><p>删除原文件所有内容，用以下内容取代：</p>
-  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">deb http://mirrors.ustc.edu.cn/archive.raspberrypi.org/debian/ stretch main ui</span><br></pre></td></tr></table></figure></li>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">deb http://mirrors.ustc.edu.cn/archive.raspberrypi.org/debian/ stretch main ui</span><br></pre></td></tr></table></figure>
+</li>
 </ul>
 
       
@@ -414,6 +469,10 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/07/16/hexo-new-post/" rel="prev" title="Hexo 发布新文章">
+                Hexo 发布新文章 <i class="fa fa-chevron-right"></i>
+              </a>
             
           </div>
         </div>
@@ -475,6 +534,10 @@
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
+              <img class="site-author-image" itemprop="image"
+                src="/images/avatar.jpeg"
+                alt="Mark Smith" />
+            
               <p class="site-author-name" itemprop="name">Mark Smith</p>
               <p class="site-description motion-element" itemprop="description"></p>
           </div>
@@ -486,14 +549,46 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">5</span>
+                    <span class="site-state-item-count">6</span>
                     <span class="site-state-item-name">posts</span>
                   </a>
                 </div>
               
 
               
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">4</span>
+                    <span class="site-state-item-name">categories</span>
+                  </a>
+                </div>
+              
 
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                    <span class="site-state-item-count">1</span>
+                    <span class="site-state-item-name">tags</span>
+                  </a>
+                </div>
               
             </nav>
           
