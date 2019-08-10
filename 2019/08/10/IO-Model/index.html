@@ -108,24 +108,29 @@
 
 
 
-  <meta name="description" content="树莓派默认的更新源访问速度较慢，这里，我们将树莓派的源改为中科大站点。主要修改两个文件: 软件更新源和系统更新源。 替换软件更新源 编辑 /etc/apt/sources.list 文件   1sudo nano /etc/apt/sources.list  删除原文件所有内容，用以下内容取代：   1deb http://mirrors.ustc.edu.cn/raspbian/raspbian">
+  <meta name="description" content="在《UNIX网络编程卷1》中，提到了五种IO模型，分别如下：  阻塞IO（Blocking IO） 非阻塞IO（nonblocking IO） IO多路复用（IO multiplexing） 信号驱动的IO（SIGIO） 异步IO（asynchronous IO）  对于一个IO操作，通常可以将其分为两个阶段  内核等待数据ready 将数据从内核空间拷贝到用户空间  上述不同IO模型的区别主要在">
 <meta property="og:type" content="article">
-<meta property="og:title" content="树莓派更换国内镜像源">
-<meta property="og:url" content="http://yoursite.com/2019/06/21/change-source-of-Raspbnerry-Pi/index.html">
+<meta property="og:title" content="IO模型">
+<meta property="og:url" content="http://yoursite.com/2019/08/10/IO-Model/index.html">
 <meta property="og:site_name" content="Mark">
-<meta property="og:description" content="树莓派默认的更新源访问速度较慢，这里，我们将树莓派的源改为中科大站点。主要修改两个文件: 软件更新源和系统更新源。 替换软件更新源 编辑 /etc/apt/sources.list 文件   1sudo nano /etc/apt/sources.list  删除原文件所有内容，用以下内容取代：   1deb http://mirrors.ustc.edu.cn/raspbian/raspbian">
+<meta property="og:description" content="在《UNIX网络编程卷1》中，提到了五种IO模型，分别如下：  阻塞IO（Blocking IO） 非阻塞IO（nonblocking IO） IO多路复用（IO multiplexing） 信号驱动的IO（SIGIO） 异步IO（asynchronous IO）  对于一个IO操作，通常可以将其分为两个阶段  内核等待数据ready 将数据从内核空间拷贝到用户空间  上述不同IO模型的区别主要在">
 <meta property="og:locale" content="default">
-<meta property="og:updated_time" content="2019-07-16T02:19:37.112Z">
+<meta property="og:image" content="http://yoursite.com/images/IO_Models/blocking_IO.jpeg">
+<meta property="og:image" content="http://yoursite.com/images/IO_Models/noblocking_IO.jpeg">
+<meta property="og:image" content="http://yoursite.com/images/IO_Models/IO_multi.jpeg">
+<meta property="og:image" content="http://yoursite.com/images/IO_Models/async_IO.jpeg">
+<meta property="og:updated_time" content="2019-08-10T09:41:50.319Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="树莓派更换国内镜像源">
-<meta name="twitter:description" content="树莓派默认的更新源访问速度较慢，这里，我们将树莓派的源改为中科大站点。主要修改两个文件: 软件更新源和系统更新源。 替换软件更新源 编辑 /etc/apt/sources.list 文件   1sudo nano /etc/apt/sources.list  删除原文件所有内容，用以下内容取代：   1deb http://mirrors.ustc.edu.cn/raspbian/raspbian">
+<meta name="twitter:title" content="IO模型">
+<meta name="twitter:description" content="在《UNIX网络编程卷1》中，提到了五种IO模型，分别如下：  阻塞IO（Blocking IO） 非阻塞IO（nonblocking IO） IO多路复用（IO multiplexing） 信号驱动的IO（SIGIO） 异步IO（asynchronous IO）  对于一个IO操作，通常可以将其分为两个阶段  内核等待数据ready 将数据从内核空间拷贝到用户空间  上述不同IO模型的区别主要在">
+<meta name="twitter:image" content="http://yoursite.com/images/IO_Models/blocking_IO.jpeg">
 
 
 
 
 
 
-  <link rel="canonical" href="http://yoursite.com/2019/06/21/change-source-of-Raspbnerry-Pi/"/>
+  <link rel="canonical" href="http://yoursite.com/2019/08/10/IO-Model/"/>
 
 
 
@@ -135,7 +140,7 @@
   };
 </script>
 
-  <title>树莓派更换国内镜像源 | Mark</title>
+  <title>IO模型 | Mark</title>
   
 
 
@@ -306,7 +311,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/06/21/change-source-of-Raspbnerry-Pi/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/08/10/IO-Model/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Mark Smith">
@@ -323,7 +328,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">树莓派更换国内镜像源
+          <h1 class="post-title" itemprop="name headline">IO模型
               
             
           </h1>
@@ -348,46 +353,16 @@
                 
               
 
-              <time title="Created: 2019-06-21 11:59:48" itemprop="dateCreated datePublished" datetime="2019-06-21T11:59:48+08:00">2019-06-21</time>
+              <time title="Created: 2019-08-10 16:46:08 / Modified: 17:41:50" itemprop="dateCreated datePublished" datetime="2019-08-10T16:46:08+08:00">2019-08-10</time>
             
 
             
               
 
-              
-                
-                <span class="post-meta-divider">|</span>
-                
-
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">Edited on</span>
-                
-                <time title="Modified: 2019-07-16 10:19:37" itemprop="dateModified" datetime="2019-07-16T10:19:37+08:00">2019-07-16</time>
               
             
           </span>
 
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Raspberry-Pi/" itemprop="url" rel="index"><span itemprop="name">Raspberry Pi</span></a></span>
-
-                
-                
-              
-            </span>
           
 
           
@@ -416,23 +391,24 @@
       
 
       
-        <p>树莓派默认的更新源访问速度较慢，这里，我们将树莓派的源改为中科大站点。主要修改两个文件: 软件更新源和系统更新源。</p>
-<h2 id="替换软件更新源"><a href="#替换软件更新源" class="headerlink" title="替换软件更新源"></a>替换软件更新源</h2><ul>
-<li><p>编辑 <code>/etc/apt/sources.list</code> 文件</p>
-  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo nano /etc/apt/sources.list</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>删除原文件所有内容，用以下内容取代：</p>
-  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">deb http://mirrors.ustc.edu.cn/raspbian/raspbian/ stretch main contrib non-free rpi</span><br></pre></td></tr></table></figure>
-</li>
-</ul>
-<h2 id="替换系统更新源"><a href="#替换系统更新源" class="headerlink" title="替换系统更新源"></a>替换系统更新源</h2><ul>
-<li><p>编辑 <code>/etc/apt/sources.list.d/raspi.list</code> 文件</p>
-  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo nano /etc/apt/sources.list.d/raspi.list</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>删除原文件所有内容，用以下内容取代：</p>
-  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">deb http://mirrors.ustc.edu.cn/archive.raspberrypi.org/debian/ stretch main ui</span><br></pre></td></tr></table></figure>
-</li>
-</ul>
+        <p>在《UNIX网络编程卷1》中，提到了五种IO模型，分别如下：</p>
+<ol>
+<li>阻塞IO（Blocking IO）</li>
+<li>非阻塞IO（nonblocking IO）</li>
+<li>IO多路复用（IO multiplexing）</li>
+<li>信号驱动的IO（SIGIO）</li>
+<li>异步IO（asynchronous IO）</li>
+</ol>
+<p>对于一个IO操作，通常可以将其分为两个阶段</p>
+<ol>
+<li>内核等待数据ready</li>
+<li>将数据从内核空间拷贝到用户空间</li>
+</ol>
+<p>上述不同IO模型的区别主要在IO操作两个阶段的不同</p>
+<h3 id="阻塞IO"><a href="#阻塞IO" class="headerlink" title="阻塞IO"></a>阻塞IO</h3><p>以recefrom为例，阻塞IO的数据读取操作流程如下。当用户调用了recvfrom后，进程会阻塞，直到数据到来并且数据从内核缓冲区拷贝到用户缓冲区，调用才会得到返回结果，进程结束阻塞。<br><img src="/images/IO_Models/blocking_IO.jpeg" height="330" width="495"></p>
+<h3 id="非阻塞IO"><a href="#非阻塞IO" class="headerlink" title="非阻塞IO"></a>非阻塞IO</h3><p>同样以recvfrom为例，当用户设置socket为非阻塞时，其数据读取操作流程如下。用户进程开始执行recvfrom后，如果在内核缓冲区没有数据，则函数直接返回，不会阻塞进程。在用户进程看起来，它发起一个read操作后，立刻得到了结果。如果数据没有准备好，用户进程需要不断轮询；如果数据准备好了，操作系统将内核缓冲区中的数据拷贝到用户缓冲区，然后返回。<br><img src="/images/IO_Models/noblocking_IO.jpeg" height="330" width="495"></p>
+<h3 id="IO多路复用"><a href="#IO多路复用" class="headerlink" title="IO多路复用"></a>IO多路复用</h3><p>IO多路复用的流程如下图所示。其意义在于一个进程可以处理多个IO。IO多路复用的原理是一个进程轮询用户进程感兴趣的IO操作，当某个IO发生了用户感兴趣的事件，通知用户进程。<br>以select为例，当用户进程调用了select后，整个进程阻塞，直到select所监听的某一socket数据准备好（内核空间数据ready），select返回。返回后，用户进程需要再调用recvfrom，将内核缓冲区的数据拷贝到用户空间。<br>注意：为了防止进程阻塞，IO多路复用中的socket一般设置为no-blocking<br><img src="/images/IO_Models/IO_multi.jpeg" height="330" width="495"></p>
+<h3 id="异步IO"><a href="#异步IO" class="headerlink" title="异步IO"></a>异步IO</h3><p>上述三种IO都属于同步IO，异步IO的流程如下图所示。当用户进程发起异步IO调用之后，内核立刻返回，用户进程不会被阻塞。之后，内核等待数据ready，并将其拷贝到用户空间。操作完成之后，内核会通过信号或回调函数的形式，通知用户进程数据拷贝完成，进行下一步处理<br><img src="/images/IO_Models/async_IO.jpeg" height="330" width="495"></p>
 
       
     </div>
@@ -460,8 +436,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2019/06/15/Boyer-Moore-Voting-Algorithm/" rel="next" title="摩尔投票算法">
-                <i class="fa fa-chevron-left"></i> 摩尔投票算法
+              <a href="/2019/07/16/hexo-new-post/" rel="next" title="Hexo 发布新文章">
+                <i class="fa fa-chevron-left"></i> Hexo 发布新文章
               </a>
             
           </div>
@@ -469,10 +445,6 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2019/07/16/hexo-new-post/" rel="prev" title="Hexo 发布新文章">
-                Hexo 发布新文章 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -621,7 +593,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#替换软件更新源"><span class="nav-number">1.</span> <span class="nav-text">替换软件更新源</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#替换系统更新源"><span class="nav-number">2.</span> <span class="nav-text">替换系统更新源</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#阻塞IO"><span class="nav-number">1.</span> <span class="nav-text">阻塞IO</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#非阻塞IO"><span class="nav-number">2.</span> <span class="nav-text">非阻塞IO</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#IO多路复用"><span class="nav-number">3.</span> <span class="nav-text">IO多路复用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#异步IO"><span class="nav-number">4.</span> <span class="nav-text">异步IO</span></a></li></ol></div>
             
 
           </div>
