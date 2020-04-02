@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.5.0" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.5.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.5.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.5.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.5.0" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '6.5.0',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="内核为不同请求服务* 内核抢占     * 如果进程正在执行内核函数时，允许发生内核切换，则这个内核就是可抢占内核     * 可抢占内核的特点： 一个在内核态运行的进程，可能在执行内核函数期间被另外一个进程取代  * 同步原语     * Linux内核使用的同步技术  * 每CPU变量     * 系统为每个CPU分配数据，一个CPU不能访问其他CPU的元素     * 仅针对来自不同CPU">
+<meta name="keywords" content="linux">
+<meta property="og:type" content="article">
+<meta property="og:title" content="内核同步">
+<meta property="og:url" content="http://yoursite.com/2020/04/01/synchronize/index.html">
+<meta property="og:site_name" content="Mark">
+<meta property="og:description" content="内核为不同请求服务* 内核抢占     * 如果进程正在执行内核函数时，允许发生内核切换，则这个内核就是可抢占内核     * 可抢占内核的特点： 一个在内核态运行的进程，可能在执行内核函数期间被另外一个进程取代  * 同步原语     * Linux内核使用的同步技术  * 每CPU变量     * 系统为每个CPU分配数据，一个CPU不能访问其他CPU的元素     * 仅针对来自不同CPU">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="http://yoursite.com/images/linux_kernel/ch05/内核同步.png">
+<meta property="og:image" content="http://yoursite.com/images/linux_kernel/ch05/Linux内核使用的同步技术.png">
+<meta property="og:image" content="http://yoursite.com/images/linux_kernel/ch05/Linux中的原子操作.png">
+<meta property="og:image" content="http://yoursite.com/images/linux_kernel/ch05/Linux中的内存屏障.png">
+<meta property="og:updated_time" content="2020-04-01T01:12:39.446Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="内核同步">
+<meta name="twitter:description" content="内核为不同请求服务* 内核抢占     * 如果进程正在执行内核函数时，允许发生内核切换，则这个内核就是可抢占内核     * 可抢占内核的特点： 一个在内核态运行的进程，可能在执行内核函数期间被另外一个进程取代  * 同步原语     * Linux内核使用的同步技术  * 每CPU变量     * 系统为每个CPU分配数据，一个CPU不能访问其他CPU的元素     * 仅针对来自不同CPU">
+<meta name="twitter:image" content="http://yoursite.com/images/linux_kernel/ch05/内核同步.png">
+
+
+
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2020/04/01/synchronize/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>内核同步 | Mark</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Mark</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />Home</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+    <a href="/categories/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-th"></i> <br />Categories</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+    <a href="/tags/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />Tags</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />Archives</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+    <a href="/about/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-user"></i> <br />About</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/04/01/synchronize/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Mark Smith">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/my/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Mark">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">内核同步
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2020-04-01 08:04:58 / Modified: 09:12:39" itemprop="dateCreated datePublished" datetime="2020-04-01T08:04:58+08:00">2020-04-01</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/深入理解Linux内核/" itemprop="url" rel="index"><span itemprop="name">深入理解Linux内核</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p><img src="/images/linux_kernel/ch05/内核同步.png" width="60%" height="60%" title="内核同步" alt=""></p>
+<h3 id="内核为不同请求服务"><a href="#内核为不同请求服务" class="headerlink" title="内核为不同请求服务"></a>内核为不同请求服务</h3><pre><code>* 内核抢占
+    * 如果进程正在执行内核函数时，允许发生内核切换，则这个内核就是可抢占内核
+    * 可抢占内核的特点： 一个在内核态运行的进程，可能在执行内核函数期间被另外一个进程取代
+
+* 同步原语
+    * Linux内核使用的同步技术
+</code></pre><p><img src="/images/linux_kernel/ch05/Linux内核使用的同步技术.png" width="60%" height="60%" title="Linux内核使用的同步技术" alt=""></p>
+<pre><code>* 每CPU变量
+    * 系统为每个CPU分配数据，一个CPU不能访问其他CPU的元素
+    * 仅针对来自不同CPU的并发访问提供保护，对来自异步函数的访问不提供保护
+
+* 原子操作
+    * 避免“读-修改-写”指令引起的竞争条件
+    * Linux中的原子操作
+</code></pre><p><img src="/images/linux_kernel/ch05/Linux中的原子操作.png" width="60%" height="60%" title="Linux中的原子操作" alt=""></p>
+<pre><code>* 内存屏障
+    * 优化屏障： 保证编译程序不会混淆放在原语操作之前的汇编语言指令和放在原语操作之后的汇编语言指令
+    * 内存屏障： 确保在原语之后的操作开始执行之前，原语之前的操作已经完成
+    * Linux使用6个内存屏障原语
+</code></pre><p><img src="/images/linux_kernel/ch05/Linux中的内存屏障.png" width="60%" height="60%" title="Linux中的内存屏障" alt=""></p>
+<pre><code>    * 自旋锁
+        * 忙等
+        * spin_lock宏：请求自旋锁，详细步骤见P204
+        * 读写自旋锁：允许并发读
+
+    * 顺序锁
+        * 类似读写自旋锁，为写者赋予较高的优先级
+
+    * 读-拷贝-更新(RCU)
+        * 允许多个读者和写者并发
+        * 只保护动态分配并通过指针引用的数据结构
+        * 在被RCU保护的临界区，任何内核控制路径都不能睡眠
+        * 写者更新数据结构时，更新数据结构的副本，修改完毕后，写者改变指向数据结构的指针，使其指向被修改的副本。由于修改指针操作是原子操作，所以，不会导致数据不一致。
+
+    * 信号量
+        * 两种信号量
+            * 内核信号量
+            * System V IPC信号量
+        * 信号量的获取和释放（P212）
+        * 读写信号量
+
+    * 禁止本地中断
+
+    * 进制和激活可延迟函数
+        * 修改thread_info中的软中断计数器
+
+* 对内核数据结构的同步访问
+    * 保护异常锁访问的数据结构
+        * 信号量
+    * 保护中断所访问的数据结构
+        * 针对多个中断处理程序访问一个数据结构
+        * 禁止本地中断
+    * 保护可延迟函数所访问的数据结构
+        * 自旋锁
+    * 保护由异常和中断访问的数据结构
+        * 本地中断进制+自旋锁
+    * 保护由异常和可延迟函数访问的数据结构
+        * 本地中断禁止+自旋锁
+    * 保护由中断和可延迟函数访问的数据结构
+        * 本地中断禁止+自旋锁
+    * 保护由异常、中断和可延迟函数访问的数据结构
+        * 本地中断进制+自旋锁
+
+* 避免竞争条件的实例
+    * 引用计数器
+    * 大内核锁
+    * 内存描述符读写信号量
+    * slab高速缓存链表的信号量
+    * 索引节点的信号量
+</code></pre>
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/linux/" rel="tag"># linux</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/04/01/interrupt/" rel="next" title="中断和异常">
+                <i class="fa fa-chevron-left"></i> 中断和异常
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2020/04/01/timing-measurement/" rel="prev" title="定时测量">
+                定时测量 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+    <div id="gitalk-container">
+    </div>
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/my/avatar.jpg"
+                alt="Mark Smith" />
+            
+              <p class="site-author-name" itemprop="name">Mark Smith</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">16</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">5</span>
+                    <span class="site-state-item-name">categories</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">2</span>
+                    <span class="site-state-item-name">tags</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#内核为不同请求服务"><span class="nav-number">1.</span> <span class="nav-text">内核为不同请求服务</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright"> &copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Mark Smith</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> v3.7.1</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme – <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Pisces</a> v6.5.0</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.5.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.5.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.5.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.5.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.5.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.5.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.5.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+  <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+   <script type="text/javascript">
+        var gitalk = new Gitalk({
+          clientID: 'e06a8131ccdebf83b30b',
+          clientSecret: '992ea430c804ee621491b26f6510fb6ffeaa2754',
+          repo: 'zjd0112.github.io',
+          owner: 'zjd0112',
+          admin: ['zjd0112'],
+          id: location.pathname,
+          distractionFreeMode: 'true'
+        })
+        gitalk.render('gitalk-container')           
+       </script>
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

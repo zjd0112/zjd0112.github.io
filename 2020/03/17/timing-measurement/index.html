@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.5.0" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.5.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.5.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.5.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.5.0" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '6.5.0',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="时钟和定时器电路 实时时钟（RTC）  独立于CPU，单独供电 Linux只用RTC获取时间和日期   时间戳计数器（TSC）  CPU内部提供 与处理器频率有关 可以获得更精确的时间测量   可编程间隔定时器（PIT）  CPU本地定时器  高精度事件定时器  ACPI电源管理定时器   Linux计时体系机构 定时器对象  jiffies 变量  计数器，记录系统自启动以来产生的节拍总数">
+<meta name="keywords" content="linux">
+<meta property="og:type" content="article">
+<meta property="og:title" content="定时测量">
+<meta property="og:url" content="http://yoursite.com/2020/03/17/timing-measurement/index.html">
+<meta property="og:site_name" content="Mark">
+<meta property="og:description" content="时钟和定时器电路 实时时钟（RTC）  独立于CPU，单独供电 Linux只用RTC获取时间和日期   时间戳计数器（TSC）  CPU内部提供 与处理器频率有关 可以获得更精确的时间测量   可编程间隔定时器（PIT）  CPU本地定时器  高精度事件定时器  ACPI电源管理定时器   Linux计时体系机构 定时器对象  jiffies 变量  计数器，记录系统自启动以来产生的节拍总数">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="http://yoursite.com/images/linux_kernel/ch06/定时测量.png">
+<meta property="og:image" content="http://yoursite.com/images/linux_kernel/ch06/定时器对象.png">
+<meta property="og:image" content="http://yoursite.com/images/linux_kernel/ch06/与POSIX相关的系统调用.png">
+<meta property="og:updated_time" content="2020-04-02T00:59:39.188Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="定时测量">
+<meta name="twitter:description" content="时钟和定时器电路 实时时钟（RTC）  独立于CPU，单独供电 Linux只用RTC获取时间和日期   时间戳计数器（TSC）  CPU内部提供 与处理器频率有关 可以获得更精确的时间测量   可编程间隔定时器（PIT）  CPU本地定时器  高精度事件定时器  ACPI电源管理定时器   Linux计时体系机构 定时器对象  jiffies 变量  计数器，记录系统自启动以来产生的节拍总数">
+<meta name="twitter:image" content="http://yoursite.com/images/linux_kernel/ch06/定时测量.png">
+
+
+
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2020/03/17/timing-measurement/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>定时测量 | Mark</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Mark</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />Home</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+    <a href="/categories/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-th"></i> <br />Categories</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+    <a href="/tags/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />Tags</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />Archives</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+    <a href="/about/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-user"></i> <br />About</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/03/17/timing-measurement/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Mark Smith">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/my/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Mark">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">定时测量
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2020-03-17 09:13:18" itemprop="dateCreated datePublished" datetime="2020-03-17T09:13:18+08:00">2020-03-17</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2020-04-02 08:59:39" itemprop="dateModified" datetime="2020-04-02T08:59:39+08:00">2020-04-02</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/深入理解Linux内核/" itemprop="url" rel="index"><span itemprop="name">深入理解Linux内核</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p><img src="/images/linux_kernel/ch06/定时测量.png" width="60%" height="60%" title="定时测量" alt=""></p>
+<h3 id="时钟和定时器电路"><a href="#时钟和定时器电路" class="headerlink" title="时钟和定时器电路"></a>时钟和定时器电路</h3><ul>
+<li><p>实时时钟（RTC）</p>
+<ul>
+<li>独立于CPU，单独供电</li>
+<li>Linux只用RTC获取时间和日期</li>
+</ul>
+</li>
+<li><p>时间戳计数器（TSC）</p>
+<ul>
+<li>CPU内部提供</li>
+<li>与处理器频率有关</li>
+<li>可以获得更精确的时间测量</li>
+</ul>
+</li>
+<li><p>可编程间隔定时器（PIT）</p>
+</li>
+<li><p>CPU本地定时器</p>
+</li>
+<li><p>高精度事件定时器</p>
+</li>
+<li><p>ACPI电源管理定时器</p>
+</li>
+</ul>
+<h3 id="Linux计时体系机构"><a href="#Linux计时体系机构" class="headerlink" title="Linux计时体系机构"></a>Linux计时体系机构</h3><ul>
+<li><p>定时器对象<br><img src="/images/linux_kernel/ch06/定时器对象.png" width="60%" height="60%" title="定时器对象" alt=""></p>
+</li>
+<li><p>jiffies 变量</p>
+<ul>
+<li>计数器，记录系统自启动以来产生的节拍总数</li>
+</ul>
+</li>
+<li><p>xtime 变量</p>
+<ul>
+<li>存放当前时间和日期，包含两个字段<ul>
+<li>tv_sec</li>
+<li>tv_nsec</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>单处理器系统上的计时体系结构</p>
+<ul>
+<li>所有与定时有关的活动都是由IRQ线0上的可编程间隔定时器产生的中断触发</li>
+<li>初始化阶段（P236）</li>
+<li>时钟中断处理程序（P237）</li>
+</ul>
+</li>
+<li><p>多处理器系统上的计时体系结构</p>
+<ul>
+<li>依赖两种不同的时钟中断源<ul>
+<li>可编程间隔定时器或高精度事件定时器产生的中断</li>
+<li>CPU本地定时器产生的中断</li>
+</ul>
+</li>
+<li>存在全局时钟中断处理程序和本地时钟中断处理程序</li>
+</ul>
+</li>
+</ul>
+<h3 id="更新时间和日期"><a href="#更新时间和日期" class="headerlink" title="更新时间和日期"></a>更新时间和日期</h3><ul>
+<li>内核更新xtime变量</li>
+<li>用户程序从xtime变量中获得当前时间和日期</li>
+</ul>
+<h3 id="更新系统统计数"><a href="#更新系统统计数" class="headerlink" title="更新系统统计数"></a>更新系统统计数</h3><ul>
+<li><p>内核需要在定时相关的其他任务中周期性地收集若干数据用于：</p>
+<ul>
+<li>检查运行CPU的资源限制</li>
+<li>更新与本地CPU工作负载有关的统计数</li>
+<li>计算平均系统负载</li>
+<li>监管内核代码</li>
+</ul>
+</li>
+<li><p>更新本地CPU统计数</p>
+</li>
+<li>记录系统负载（uptime命令）</li>
+<li>监管内核代码</li>
+<li>检查非屏蔽中断（NMI）监视器</li>
+</ul>
+<h3 id="软定时和延迟函数"><a href="#软定时和延迟函数" class="headerlink" title="软定时和延迟函数"></a>软定时和延迟函数</h3><ul>
+<li>定时器：函数在给定时间间隔用完时被调用</li>
+<li>Linux定时器由可延迟函数实现，不能确保正好到期执行</li>
+<li>动态定时器的应用：nanosleep()系统调用</li>
+<li>延迟函数： 内核需要等待较短的时间，可使用延迟函数<ul>
+<li>udelay</li>
+<li>ndelay</li>
+</ul>
+</li>
+</ul>
+<h3 id="与定时测量有关的系统调用"><a href="#与定时测量有关的系统调用" class="headerlink" title="与定时测量有关的系统调用"></a>与定时测量有关的系统调用</h3><ul>
+<li><p>time 和 gettimeofday</p>
+<ul>
+<li>time: 1970年1月1日开始走过的秒数</li>
+<li>gettimeofday: 1970年1月1日开始走过的秒数 + 在前1秒内走过的微秒数</li>
+<li>具体实现见P253</li>
+</ul>
+</li>
+<li><p>adjtimex</p>
+</li>
+<li><p>setitimer 和 alarm</p>
+<ul>
+<li>激活间隔定时器</li>
+</ul>
+</li>
+<li><p>与POSIX定时器相关的系统调用<br><img src="/images/linux_kernel/ch06/与POSIX相关的系统调用.png" width="60%" height="60%" title="与POSIX相关的系统调用" alt=""></p>
+</li>
+</ul>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/linux/" rel="tag"># linux</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/03/16/synchronize/" rel="next" title="内核同步">
+                <i class="fa fa-chevron-left"></i> 内核同步
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2020/03/20/process-schedule/" rel="prev" title="进程调度">
+                进程调度 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+    <div id="gitalk-container">
+    </div>
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/my/avatar.jpg"
+                alt="Mark Smith" />
+            
+              <p class="site-author-name" itemprop="name">Mark Smith</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">16</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">5</span>
+                    <span class="site-state-item-name">categories</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">2</span>
+                    <span class="site-state-item-name">tags</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#时钟和定时器电路"><span class="nav-number">1.</span> <span class="nav-text">时钟和定时器电路</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Linux计时体系机构"><span class="nav-number">2.</span> <span class="nav-text">Linux计时体系机构</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#更新时间和日期"><span class="nav-number">3.</span> <span class="nav-text">更新时间和日期</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#更新系统统计数"><span class="nav-number">4.</span> <span class="nav-text">更新系统统计数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#软定时和延迟函数"><span class="nav-number">5.</span> <span class="nav-text">软定时和延迟函数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#与定时测量有关的系统调用"><span class="nav-number">6.</span> <span class="nav-text">与定时测量有关的系统调用</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright"> &copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Mark Smith</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> v3.7.1</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme – <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Pisces</a> v6.5.0</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.5.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.5.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.5.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.5.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.5.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.5.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.5.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+  <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+   <script type="text/javascript">
+        var gitalk = new Gitalk({
+          clientID: 'e06a8131ccdebf83b30b',
+          clientSecret: '992ea430c804ee621491b26f6510fb6ffeaa2754',
+          repo: 'zjd0112.github.io',
+          owner: 'zjd0112',
+          admin: ['zjd0112'],
+          id: location.pathname,
+          distractionFreeMode: 'true'
+        })
+        gitalk.render('gitalk-container')           
+       </script>
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

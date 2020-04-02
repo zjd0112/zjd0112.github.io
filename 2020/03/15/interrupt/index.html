@@ -1,0 +1,921 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.5.0" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.5.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.5.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.5.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.5.0" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '6.5.0',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="中断信号的作用 作用 允许处理器执行正常控制流之外的代码 中断与进程上下文切换的区别 中断或异常处理程序执行的代码不是一个进程。 相比于上下文切换，中断的上下文很少，需要时间更少      中断和异常 中断（CPU外其他设备产生） 可屏蔽中断：可被屏蔽，屏蔽后控制单元忽略该中断 非屏蔽中断：少数几个危机事件引起非屏蔽中断（如硬件故障）   异常（CPU控制单元产生）  处理器探测异常 故障 陷阱">
+<meta name="keywords" content="linux">
+<meta property="og:type" content="article">
+<meta property="og:title" content="中断和异常">
+<meta property="og:url" content="http://yoursite.com/2020/03/15/interrupt/index.html">
+<meta property="og:site_name" content="Mark">
+<meta property="og:description" content="中断信号的作用 作用 允许处理器执行正常控制流之外的代码 中断与进程上下文切换的区别 中断或异常处理程序执行的代码不是一个进程。 相比于上下文切换，中断的上下文很少，需要时间更少      中断和异常 中断（CPU外其他设备产生） 可屏蔽中断：可被屏蔽，屏蔽后控制单元忽略该中断 非屏蔽中断：少数几个危机事件引起非屏蔽中断（如硬件故障）   异常（CPU控制单元产生）  处理器探测异常 故障 陷阱">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="http://yoursite.com/images/linux_kernel/ch04/中断和异常.png">
+<meta property="og:image" content="http://yoursite.com/images/linux_kernel/ch04/门描述符的格式.png">
+<meta property="og:image" content="http://yoursite.com/images/linux_kernel/ch04/IO中断处理.png">
+<meta property="og:image" content="http://yoursite.com/images/linux_kernel/ch04/从中断和异常返回.png">
+<meta property="og:updated_time" content="2020-04-02T00:57:58.168Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="中断和异常">
+<meta name="twitter:description" content="中断信号的作用 作用 允许处理器执行正常控制流之外的代码 中断与进程上下文切换的区别 中断或异常处理程序执行的代码不是一个进程。 相比于上下文切换，中断的上下文很少，需要时间更少      中断和异常 中断（CPU外其他设备产生） 可屏蔽中断：可被屏蔽，屏蔽后控制单元忽略该中断 非屏蔽中断：少数几个危机事件引起非屏蔽中断（如硬件故障）   异常（CPU控制单元产生）  处理器探测异常 故障 陷阱">
+<meta name="twitter:image" content="http://yoursite.com/images/linux_kernel/ch04/中断和异常.png">
+
+
+
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2020/03/15/interrupt/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>中断和异常 | Mark</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Mark</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />Home</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+    <a href="/categories/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-th"></i> <br />Categories</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+    <a href="/tags/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />Tags</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />Archives</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+    <a href="/about/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-user"></i> <br />About</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/03/15/interrupt/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Mark Smith">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/my/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Mark">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">中断和异常
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2020-03-15 00:50:45" itemprop="dateCreated datePublished" datetime="2020-03-15T00:50:45+08:00">2020-03-15</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2020-04-02 08:57:58" itemprop="dateModified" datetime="2020-04-02T08:57:58+08:00">2020-04-02</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/深入理解Linux内核/" itemprop="url" rel="index"><span itemprop="name">深入理解Linux内核</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p><img src="/images/linux_kernel/ch04/中断和异常.png" width="60%" height="60%" title="中断和异常" alt=""></p>
+<h3 id="中断信号的作用"><a href="#中断信号的作用" class="headerlink" title="中断信号的作用"></a>中断信号的作用</h3><ul>
+<li>作用<ul>
+<li>允许处理器执行正常控制流之外的代码</li>
+<li>中断与进程上下文切换的区别<ul>
+<li>中断或异常处理程序执行的代码不是一个进程。</li>
+<li>相比于上下文切换，中断的上下文很少，需要时间更少</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="中断和异常"><a href="#中断和异常" class="headerlink" title="中断和异常"></a>中断和异常</h3><ul>
+<li>中断（CPU外其他设备产生）<ul>
+<li>可屏蔽中断：可被屏蔽，屏蔽后控制单元忽略该中断</li>
+<li>非屏蔽中断：少数几个危机事件引起非屏蔽中断（如硬件故障）</li>
+</ul>
+</li>
+<li><p>异常（CPU控制单元产生）</p>
+<ul>
+<li>处理器探测异常<ul>
+<li>故障</li>
+<li>陷阱</li>
+<li>异常终止</li>
+</ul>
+</li>
+<li>编程异常(软中断)<ul>
+<li>编程者发出请求时发生</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>中断描述符表（IDT）</p>
+<ul>
+<li>存储中断向量及对应的中断或异常处理程序的入口地址</li>
+<li>IDT包含的三种类型描述符<ul>
+<li>任务门：中断信号发生时，必须取代当前进程的那个进程的TSS选择符放在任务门中</li>
+<li>中断门: 包含端选择符和中断或异常处理程序的段内偏移量</li>
+<li>陷阱门：与中断门类似。<br><img src="/images/linux_kernel/ch04/门描述符的格式.png" width="60%" height="60%" title="中断和异常" alt=""></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>中断和异常的硬件处理</p>
+<ul>
+<li>详见P146</li>
+</ul>
+</li>
+<li><p>初始化中断描述符表</p>
+</li>
+<li><p>异常处理</p>
+<ul>
+<li>异常处理程序的标准结构<ul>
+<li>在内核堆栈保存大多数寄存器的内容</li>
+<li>对异常进行处理</li>
+<li>从异常处理函数中退出</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>中断处理</p>
+<ul>
+<li>与异常处理的主要区别： 中断到达时，一个完全无关的进程可能在运行</li>
+<li>三种主要类型的中断：<ul>
+<li>I/O中断</li>
+<li>时钟中断</li>
+<li>处理器间中断</li>
+</ul>
+</li>
+<li>I/O中断处理步骤<ul>
+<li>在内核态堆栈中保存IRQ的值和寄存器的内容</li>
+<li>为正在给IRQ线服务的PIC发送一个应答</li>
+<li>执行共享这个IRQ的所有设备的中断服务例程</li>
+<li>跳到ret_from_intr()的地址后终止<br><img src="/images/linux_kernel/ch04/IO中断处理.png" width="60%" height="60%" title="IO中断处理" alt=""></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="软中断及tasklet"><a href="#软中断及tasklet" class="headerlink" title="软中断及tasklet"></a>软中断及tasklet</h3><h3 id="从中断和异常返回"><a href="#从中断和异常返回" class="headerlink" title="从中断和异常返回"></a>从中断和异常返回</h3><p><img src="/images/linux_kernel/ch04/从中断和异常返回.png" width="60%" height="60%" title="从中断和异常返回" alt=""></p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/linux/" rel="tag"># linux</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/03/13/process/" rel="next" title="进程">
+                <i class="fa fa-chevron-left"></i> 进程
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2020/03/16/synchronize/" rel="prev" title="内核同步">
+                内核同步 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+    <div id="gitalk-container">
+    </div>
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/my/avatar.jpg"
+                alt="Mark Smith" />
+            
+              <p class="site-author-name" itemprop="name">Mark Smith</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">16</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">5</span>
+                    <span class="site-state-item-name">categories</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">2</span>
+                    <span class="site-state-item-name">tags</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#中断信号的作用"><span class="nav-number">1.</span> <span class="nav-text">中断信号的作用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#中断和异常"><span class="nav-number">2.</span> <span class="nav-text">中断和异常</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#软中断及tasklet"><span class="nav-number">3.</span> <span class="nav-text">软中断及tasklet</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#从中断和异常返回"><span class="nav-number">4.</span> <span class="nav-text">从中断和异常返回</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright"> &copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Mark Smith</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> v3.7.1</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme – <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Pisces</a> v6.5.0</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.5.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.5.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.5.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.5.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.5.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.5.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.5.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+  <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+   <script type="text/javascript">
+        var gitalk = new Gitalk({
+          clientID: 'e06a8131ccdebf83b30b',
+          clientSecret: '992ea430c804ee621491b26f6510fb6ffeaa2754',
+          repo: 'zjd0112.github.io',
+          owner: 'zjd0112',
+          admin: ['zjd0112'],
+          id: location.pathname,
+          distractionFreeMode: 'true'
+        })
+        gitalk.render('gitalk-container')           
+       </script>
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
